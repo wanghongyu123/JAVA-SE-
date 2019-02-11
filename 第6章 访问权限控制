@@ -98,7 +98,38 @@ protected、包访问权限（没有关键词）和private。
      基类的创建者会希望有有某个特定成员，把对它的访问权限赋予派生类而不是所有类，这就需要protected来完成这一工作。protected也提供包访问权限，也就是
      说，相同包内的其他类可以访问protected元素。
      
-    
+3 接口和实现
+     访问权限的控制被称为具体实现的隐藏。有两个好处：1）设定客户端程序员可以使用和不可以使用的界限。2）即将接口和具体实现进行分离。
+ 
+4 类的访问权限
+     在Java中，访问权限修饰词也可以用于确定库中的哪些类对于该库的使用者是可用的。如果希望某个类可以为某个客户端程序员所用，就可以通过把关键字public
+     作用于整个类的定义达到目的。这样做甚至可以控制客户端程序员是否能创建一个该类的对象。
+     为了控制某个类的访问权限。修饰词必须出现于关键字class之前。如：public class Widget {
+     使用限制：1）每个编译单元都只能有一个public类。这表示，每个编译单元都有单一的公共接口，用public类来表现。该接口可以按要求包含众多的支持报访问
+     权限的类。如果在某个编译单元内有一个以上的public类，编译器就会给出错误信息。2）public类的名称必须完全与含有该编译单元的文件名相匹配。3）虽然
+     不是很常用，但编译单元内完全不带public类也是可能的。在这种情况下，可以随意对文件起名。
+     注意：1）类既不可以是private的（这样会使得除该类之外，其他任何类都不可以访问他），也不可以是protected的，所以对于类的访问权限，仅有两个选择：
+     包访问权限或public。2）如果不希望其他人对该类拥有访问权限，可以把所有的构造器都指定为private，从而阻止任何人创建该类的对象，但有一个例外，就是
+     你在该类的static成员内部可以创建。下面是一个示例：
+     class Soup1 {
+            private Soup1() {}
+            //(1) allow creation via static method:
+            public static Soup1 makeSoup() {
+                  reuturn new Soup1;
+            }
+     }
+     
+     class Soup2 {
+            private Soup2() {}
+            //(2) Create a static object and return a reference
+            //upon request (The "Singleton" pattern)
+            private static Soup2 ps1 = new Soup2();
+            public static Soup access() {
+                  return ps1;
+            }
+            public void f() {}
+     }
+     这种测定的模式被称为singleton（单例），这是因为你始终只能创建它的一个对象。
      
     
     
