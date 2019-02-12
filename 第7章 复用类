@@ -1,0 +1,108 @@
+1 组合语法
+    即将对象引用置于新类中即可。
+    类中toString()方法，每一个非基本类型对象都有一个toString()方法，而且当编译器需要一个String而你确已有一个对象时，该方法便会被调用。
+    初始化位置：1）在定义对象的地方。这意味着他们总是能够在构造器被调用之前被初始化。2）在类的构造其中。3）就在正要使用这些对象之前，这种方式称为惰性
+    初始化
+    
+2 继承语法
+    当创建一个类时，总是在继承，因此，除非已明确指出要从其他类中继承，否则就是在隐式地从Java的标准根类Object进行继承。继承关键字extends，当使用时，会
+    自动得到基类中所有的域和方法。
+2.1 初始化基类
+        但继承并不只是复制基类的接口。当创建了一个导出类的对象时，该对象包含了一个基类的子对象。这个子对象与你用基类直接创建的对象是一样的。二者的区别在
+    于，后者来与外部，而基类的子对象被包装在导出类对象内部。
+        当然，对于基类的正确初始化也是至关重要的，而且也仅有一种方法来保证这一点：在构造器中调用基类构造器来执行初始化，而基类构造器具有执行基类初始化所
+    需要的所有知识和能力。Java会自动在导出类的构造器中插入对基类构造器的调用。
+        但是，如果没有默认的基类构造器，或者像调用一个带参数的基类构造器，就必须用关键字super显式地编写调用基类构造器的语句，并且配合适当的参数列表。
+        
+3 代理
+    因为我们要将一个成员对象置于所要构造的类中（就像组合），但与此同时我们在新类中暴露了该类的成员对象的所有方法（就像继承）。例如，太空船需要一个控制
+    模块：
+    //：reusing/SpaceShipControls.java
+    
+    public class SpaceShipControls {
+          void up(int velocity) {}
+          void down(int velocity) {}
+          void left(int velocity) {}
+          void right(int velocity) {}
+          void forward(int velocity) {}
+          void back(int velocity) {}
+    }///:~
+    构造太空船的一种方式是使用继承
+    //：reusing/SpaceShip.java
+    
+    public class SpaceShip extends SpaceShipControls {
+        private String name;
+        public SpaceShip(String name) {this.name = name;}
+        public String toString() {return name;}
+        public static void main(String[] args) {
+            SpaceShip protector = new SpaceShip("NSEA Protector");
+            protector.forward(100);
+        }
+    } ///:~
+    SpaceShipControls的所有方法在SpaceShip中都暴露了出来。代理解决了此难题：
+    //：reusing/SpaceShipDelegation.java
+    
+    public class SpaceShipDelegation {
+         private String name;
+         private SpaceShipControls controls = new SpaceShipControls();
+         public SpaceShipDelegation(String name) {this.name = name;}
+         //Delegated methods
+         public void up(int velocity) {controls.up(velocity); }
+         public void down(int velocity) {controls.down(velocity); }
+         public void left(int velocity) {controls.left(velocity); }
+         public void back(int velocity) {controls.back(velocity); }
+         public void right(int velocity) {controls.right(velocity); }
+         public void forward(int velocity) {controls.forward(velocity); }
+         public static void main(String[] args) {
+            SpaceShipDelegation protector = new SpaceShipDelegation("NSEA Protector");
+            protector.forward(100);
+        }
+    }
+    可以看到，上面的方法是如何传递给了底层的controls对象，而其接口由此也就与使用继承得到的接口相同了。但是，我们使用代理时可以拥有等多的控制力，因为
+    我们可以选择只提供在成员对象中的方法的某个子集。
+    
+4 结合使用组合和继承
+    虽然编译器强制你去初始化基类，并且要去你要在构造器起始处就要这么做，但是它并不监督你必须将成员对象也初始化，因此在这一点上你自己必须时刻注意。
+4.1 确保正确处理
+    可以编写方法来进行清理，在清理方法中（dispose()），还必须注意对基类清理方法和成员对象清理方法的调用顺序，以防某个子对象依赖于另一个子对象情形的
+    发生。首先，执行类的所有特定的清理动作，其顺序同生成的顺序相反，然后调用基类的清理方法。
+4.2 名称屏蔽
+    如果Java的基类拥有某个已被多次重载的方法名称，那么在导出类中重新定义该方法名称并不会屏蔽其在基类中的任何版本。因此，无论是在该层或者它的基类中对
+    方法进行定义，重载机制都可以正常工作。
+    Java SE5新增加了@Override注解，想要覆写某个方法时，可以选择添加这个注解。这个注解可以防止你在不想重载时而意外的进行了重载。
+ 
+5 在组合与继承之间选择
+    组合和继承都允许在新的类中放置子对象，组合是显式地这样做，而继承则是隐式地做。组合技术通常用于想在新类中使用现有类的功能而非它的接口这种形式。在
+    继承地时候，使用某个现有类，并开发一个它的特殊版本。用一个 “交通工具” 对象来构成一部 “车子” 是毫无意义地，因为 “车子” 并不包含 “交通工具”，它
+    仅是一种交通工具（is-a关系）。 “is-a”（是一个）的关系是用继承来表达的，而 “has-a”（有一个）的关系则是用组合来表达的。
+    
+6 protected关键字
+    它指明 “就类用户而言，这是private的，但对于任何继承于此类的导出类或其他任何位于同一个包内的类来说，它确是可以访问的。”（protected也提供包访问
+    权限）。
+
+7 向上转型
+    由于向上转型是从一个较专用类型向较通用类型转换，所以总是很安全的。也就是说，导出类是基类的一个超集。它可能比基类含有更多的方法，但它必须至少具备
+    基类中所含有的方法。在向上转型的过程中，类接口中唯一可能发生的事情是丢失方法，而不是获取它们.
+7.1 再论组合与继承
+    到底是该用组合还是继承，一个最清晰的判断方法就是问一问自己是否需要从新类向基类进行向上转型。如果必须向上转型，则继承是必要的；但如果不需要，则应当
+    好好考虑自己是否需要继承。
+
+8 final关键字
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
