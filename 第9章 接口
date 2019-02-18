@@ -93,12 +93,42 @@
     
 8 嵌套接口
     
-    
-    
-    
-    
-    
-    
+9 接口与工厂
+    接口是实现多重继承的途径，而生成遵循某个接口的对象的典型方式就是工厂方法设计模式。这与直接调用构造器不同，我们在工厂对象上调用的是创建方法，而该
+工厂对象将生成接口的某个实现类。理论上，通过这种方式，我们的代码将完全与接口实现分离，这就使得我们可以透明的将某个实现替换为另一个实现。
+    工厂方法结构：
+    interface Service {
+        void method1();
+        void method2();
+    }
+    interface ServiceFactory {
+        Service getService();
+    }
+    class Impl1 implements Service{
+        Impl1() {}
+        public void method1() {}
+        public void method2() {}
+    }
+    class ImplFactory implements ServiceFactory {
+        public Service getService() {
+            reutrn new Impl1();
+        }
+    }
+    public class Factories {
+        public static void serviceConsumer(ServiceFactory fact) {
+            service s = fact.getService();
+            s.method1();
+            s.method2();
+        }
+        public static void main(String[] args) {
+            serviceConsumer(new Impl1());
+        }
+    }
+    如果不是工厂方法，你的代码就必须在某处制定将要创建的Serivice的确切类型，以便调用合适的构造器。为什么我们想要添加这种额外级别的间接性呢？一个常见
+的原因是想要创建框架。
+
+10 总结
+    恰当的原则应该是优先选择类而不是接口。从类开始，如果接口的必须性变得非常明确，那么就进行重构。接口是一种重要的工具，但是它们容易被滥用。
     
     
     
