@@ -30,7 +30,80 @@
     }
     
 4 Java中的多重继承
-        
+    在导出类中，不强制要求必须有一个是抽象的或 “具体的” 基类。如果要从一个非接口的类继承，那么只能从一个类去继承。其余的基元素都必须是接口。需要将所有
+的接口名都置于implements关键字之后，用逗号将它们隔开。可以继承任意多个接口，并且可以向上转型为每个接口，因为每个接口都是一个独立类型。
+    我们应该使用接口还是抽象类？如果要创建不带任何方法定义和成员变量的基类，那么就应该选择接口而不是抽象类。事实上，如果知道某事物应该成为一个基类，那
+么第一选择应该是使它成为一个接口。
+
+5 通过继承来扩展接口
+    通过继承，可以很容易地在接口中添加新的方法声明，还可以通过继承在新接口中组合数个接口。例如：
+    
+    interface Monster {
+        void menace();
+    }
+    
+    interface DangerousMonster extends Monster {
+        void destroy();
+    }
+    
+    interface Lethal {
+        void kill();
+    }
+    
+    interface Vampare extends DangerousMonster, Lethal{
+        void drinkBload();
+    }
+    
+    一般情况下，只可以将extends用于单一类，但是可以引用多个基类接口。
+    
+5.1 组合接口时的名字冲突
+    例子：覆盖，实现，重载搅在一起
+    interface I1 { void f(); }
+    interface I2 { int f(int i); }
+    interface I3 { int f(); }
+    class C {public int f() {return 1; } }
+    
+    class C2 implements I1, I2 {
+        public void f() {} // 正确，实现了接口I1中的方法
+        public int f(int i) {return 1;} //正确，实现了接口I2中的方法，并与隐藏的C类中的方法重载
+    }
+    
+    class C3 extends C implements I2 {
+        public int f(int i) {return 1;}//正确，实现了接口I2中的方法，并与隐藏的C类中方法的重载
+    }
+     
+    class C4 extends C implements I3 {
+        public int f() {return 1;} // 正确，实现了接口I3中的方法，并完成了C类中方法的覆盖
+    }
+    
+    //！class C5 extends C implements I1 {}//错误，接口I1方法没有实现
+    //! interface I4 extends I1, I3 {} //错误，接口I1和I3的方法不属于重载，会发生混乱
+    
+6 适配接口
+    接口最吸引人的原因之一就是允许同一个接口具有多个不同的具体实现。在简单的情况中，它的体现形式通常是一个接口类型的方法，而该接口的实现和向该方法传
+递的对象取决于方法的使用者。接口的常见用法：策略设计模式
+    在适配器设计模式中，我们可以在任何现有类之上添加新的接口，所以这意味着让方法接受接口类型，是一种让任何类都可以对该方法进行适配的方式。这就是使用
+接口而不是类的强大之处。
+
+7 接口中的域
+    因为你放入接口中的任何域都自动是static和final的，所以接口就成为了一种很便捷的用来创建常量值组的工具。在Java SE5之前采用这种方法产生和（枚举
+类型）一样的效果，在Java SE5时，使用枚举类型。
+7.1 初始化接口中的域
+    在接口中定义的域不能是 “空final”，但是可以是非常量表达式初始化，当然这些域不是接口的一部分，它们的值被存储在该接口的静态存储区域内。
+    
+8 嵌套接口
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
