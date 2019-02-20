@@ -1,0 +1,59 @@
+    可以将一个类的定义放在另一个类的定义内部，这就是内部类。
+    内部类是一种非常有用的特性，因为它允许你把一些逻辑相关的类组织在一起，并控制位于内部类的可视性。然而必须要了解，内部类与组合是完全不同的概念，这一点
+ 很重要。
+ 
+1 创建内部类
+    创建内部类的方式就如同你想的一样————把类的定义置于外围类的里面。如果想从外部类的非静态方法之外的任意位置创建某个内部类的对象，那么必须具体地指明这个
+对象的类型：OuterClassName.InnerClassName。
+
+2 链接到外部类
+    到目前为止，内部类似乎还只是一种名字隐藏和组织代码的模式。这些是很有用的，但还不是最引人注目的，它还有其他的用途。当生成一个内部类的对象时，此对象与
+制造它的外围对象之间就有了一种联系，所以它能访问其外围对象的所有成员，而不需要任何特殊条件。此外，内部类还拥有其外围类的所有元素的访问权。
+    所以内部类自动拥有对其外围类所有成员的访问权。这是如何做到的呢？当某个外围类的对象创建了一个内部类对象时，此内部类对象必定会秘密地捕获一个指向外围类
+对象的引用。然后，在你访问此外围类地成员时，就是用那个引用来选择外围类的成员。
+
+3 使用.this与.new
+    如果你需要生成对外部类对象的引用，可以使用外部类的名字后面紧跟圆点和this。这样产生的引用自动地具有正确的类型，这一点在编译期就被知晓并受到检查，因此
+没有任何运行时开销。下面的例子展示了如何使用.this：
+    public class DotThis {
+        void f() { System.out.println("DotThis.f()"); }
+        public class Inner {
+            public DotThis outer {
+                return DotThis.this;
+            }
+        }
+        public Inner inner { return new Inner(); }
+        public static void main(String[] args) {
+            DotThis dt = new DotThis();
+            DotThis.Inner dti = dt.inner();
+            dti.outer().f();
+        }
+    }/*output
+    DotThis.f()
+    */
+    有时你可能想要告知某些其他对象，去创建某个内部类的对象。要实现此目的，你必须在new表达式中提供对其他外部类对象的引用。例如：
+    public class DotNew {
+        public class Inner {}
+        public static void main(String[] args) {
+            DotNew dn = new DotNew();
+            DotNew.Inner dni = dn.new Inner();
+        }
+    }
+    要想创建内部类的对象，你不能按照你想象的方式，去引用外部类的名字DotNew，而是必须使用外部类的对像来创建该内部类的对象，因此你不必声明（实际上你不能
+声明）dn.new DotNew.Inner();
+
+4 内部类与向上转型
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
