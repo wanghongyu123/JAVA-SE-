@@ -130,8 +130,47 @@ Contents对象。但是然后（在到达语句结束的分号之前）你却说
     }
     JDK1.8之前使用final，JDk1.8去掉了final。
     如果想做一些类似构造器的行为，该怎么办呢？在匿名类中不可能有命名构造器（因为没有名字），但通过实例初始化，就能达到为匿名内部类创建一个构造器的效果
-
-
+就像这样：
+    abstract class Base{
+        public Base(int i ){
+            print("Base constructor, i = " + i);
+        }
+        public abstract void f();
+    }
+    
+    public class AnonymousConstructor {
+        public static Base getBase(int i) {
+            return new Base(i) {
+                {print("Inside instance initializer");}
+                public void f() {
+                    print("In anonymous f()");
+                }
+            };
+        }
+        public static void main(String[] args) {
+            Base base = getBase(47);
+            base.f();
+        }
+    }/*Output
+    Base constructor, i = 47
+    Inside instance initializer
+    In anonymous f()
+    所以对于匿名类而言，实例初始化的实际效果就是构造器。当然它受到了限制————你不能重载实例初始化方法，所以你仅有一个这样的构造器。匿名内部类与正规的
+继承相比有些受限，因为匿名内部类既可以扩展类，也可以实现接口，但是不能两者兼备。而且如果是实现接口，也只能实现一个接口。
+6.1 再访工厂方法
+    class Implemention1 implements Service {
+        private Implemention1() {}
+        public void method1() {}
+        public void method2() {}
+        public static ServiceFactory factory = 
+            new ServiceFactory() {
+                public Service getService() {
+                    return new  Implemention1;
+                }
+            };
+    }
+    构造器都可以是private的，并且没有任何必要去创建作为工厂的具名类。另外，你经常只需要单一的工厂对象，因此在本例中它被创建为Service实现类中的
+static域。这样所产语法也更具有实际意义。
 
 
 
