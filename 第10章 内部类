@@ -94,6 +94,43 @@
     Contents()方法将返回值的生成与表示这个返回值的类的定义结合在一起，另外，这个类是匿名的，它没有名字。更糟糕的是，看起来似乎是你正要创建一
 Contents对象。但是然后（在到达语句结束的分号之前）你却说：“等一等，我想在这里插入一个类的定义”。
     这种奇怪的语法指的是：“创建一个继承自Contents的匿名类的对象。” 通过new表达式返回的引用被自动向上转型为对Contents的引用。
+    在这个匿名内部类中，使用了默认的构造器来生成Contents。下面的代码展示的是，如果你的基类需要一个有参数的构造器，应该怎么办：
+    public class Parcel8 {
+        public Wrapping wrapping(int x) {
+            return new Wrapping(x) {
+                public int value() {
+                    return super.value() * 47;     //匿名类无构造函数
+                }
+            };
+        }
+        public static void main(String[] args) {
+            Parcel8 p = new Parcel8();
+            Wrapping w = p.wrapping(10);
+        }
+    }
+    只需简单地传递合适的参数给基类的构造器即可，这里是将传进new Wrapping（x）。尽管Wrapping只是一个具有具体实现的普通类，但它还是被其导出类当
+    作公共 “接口” 来使用。
+    public class Wrapping {
+        private int i;
+        public Wrapping(int x) {i = x;}
+        public int value() {return i;}
+    }
+    在匿名类中定义字段时，还能够对其执行初始化操作：
+    public class Parcel9 {
+        public Destination destination(final String dest){
+            return new Destination() {
+                private String label = dest;
+                public String readLabel() {return label;}
+            };
+        }
+        public static void main(String[] args) {
+            Parcel9 p = new Parcel9();
+            Destination d = p.destination("Tasmania");
+        }
+    }
+    JDK1.8之前使用final，JDk1.8去掉了final。
+    如果想做一些类似构造器的行为，该怎么办呢？在匿名类中不可能有命名构造器（因为没有名字），但通过实例初始化，就能达到为匿名内部类创建一个构造器的效果
+
 
 
 
