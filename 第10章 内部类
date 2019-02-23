@@ -180,9 +180,62 @@ static域。这样所产语法也更具有实际意义。
     嵌套类与普通的内部类还有一个区别。普通内部类的字段和方法，只能放在类的外部层次上，所以普通的内部类不能有static数据和static字段，也不能包含嵌套类
 但是嵌套类可以包含所有这些东西。
     创建嵌套类对像方法：外围类.嵌套类 嵌套类对像 = new 外围类.嵌套类();
+    如：
+public class InnerClassDemo{
+    int x;
+    class A{
+        static int a = 0;//这样写是不合法的.
+        static final int b=0;//这样写是合法的
+    }
+}
 
+java类加载顺序，首先加载类，执行static变量初始化，接下来执行对象的创建，如果我们要执行代码中的变量int a 初始化，那么必须先执行加载外部类，再加载内部
+类，最后初始化静态变量 a ,问题就出在加载内部类上面，我们可以把内部类看成外部类的非静态成员，它的初始化必须在外部类对象创建后以后进行，要加载内部类必须
+在实例化外部类之后完成 ，java虚拟机要求所有的静态变量必须在对象创建之前完成，这样便产生了矛盾。
+(有点绕，呵呵)
+而java常量放在内存中常量池，它的机制与变量是不同的，编译时，加载常量是不需要加载类的，所以就没有上面那种矛盾。
+7.1 接口内部的类
+    正常情况下，不能在接口内放置任何代码，但嵌套类可以作为接口的一部分。你放到接口中的任何类都自动地是public和static的。因为类是static的，只是将嵌
+套类置于接口的命名空间内，这并不违反接口的规则。你甚至可以在内部类中实现外围接口，就像下面这样：
+    public interface ClassInInterface {
+        void howdy();
+        class Test implements ClassInInterface {
+            public void howdy() {
+                System.out.println("Howdy!");    
+            }
+            public static void main(String[] args){
+                new Test().howdy();
+            }
+        }
+    }/*Output
+    Howdy!
+    *///:~
+    如果你想要创建某些公共代码，使得它们可以被某个接口的所有不同实现所共用，那么使用接口内部的嵌套类会显得很方便。
+7.2 从多层嵌套类中访问外部类的成员
+    一个内部类被嵌套多少层并不重要————它能透明的访问所有它所嵌入的外围的所有成员。如下所示：
+    class MNA {
+        private void f();
+        class A {
+            private void g();
+            public class B {
+                void h() {
+                    g();
+                    f();
+                }
+            }
+        }
+    }
+    public class MultiNestingAccess {
+        public sttaic void main(String[] args){
+            MNA mna = new MNA();
+            MNA.A mnaa = mna.new A();
+            MNA.A.B mnaaab = mnaa.new();
+            mnaab.h();
+        }
+    }
 
-
+8 为什么需要内部类
+    
 
 
 
