@@ -246,10 +246,50 @@ java类加载顺序，首先加载类，执行static变量初始化，接下来�
 息，还保留了一个创建非静态内部类对象的引用，并且可以直接调用外部类的private成员，因此可以把非静态内部类当成面向对象领域的闭包。
     通过这种仿闭包的非静态内部类，可以很方便地实现回调功能，回调就是某个方法一旦获得了内部类对象的引用后，就可以在合适时候反过来调用外部类的方法。所谓
 回调，就是允许客户类通过内部类引用来调用其外部类的方法，这是一种非常灵活的功能。
+ 8.2 内部类与控制框架
+    应用程序框架就是被设计用以解决某类特定问题的一个或一组类。要运用某个应用程序框架，通常是继承一个或多个类，并覆盖某些方法。在覆盖后的方法中，编写
+ 代码定制应用程序框架提供的通用解决方案，以解决你的特定问题。模板方法包含算法的基本结构，并且会调用一个或多个可覆盖的方法，以完成算法的动作。设计模式
+ 总是将变化的事物与保持不变的事物分开，在这个模式中，模板方法保持不变的事物，而可覆盖的方法就是变化的事物。‘
+    控制框架是一类特殊的应用程序框架，它用来解决响应事件的需求。主要用来响应事件的系统被称作事件驱动系统。控制框架并不包含任何具体的信息。那些信息是
+ 在实现算法的action()部分时，通过继承来提供的。
+    首先，接口描述了要控制的事件。因为其默认行为是基于时间去执行控制的，所以使用抽象类代替实际的接口。下面的例子包含了某些实现：
+    public abstract class Event {
+        private long eventTime;
+        protected final long delayTime;
+        public Event(long delayTime) {
+            this.delayTime = delayTime;
+            start();
+        }
+        public void start() {
+            eventTime = System.nanoTime() + delayTime;
+        }
+        public boolean ready() {
+            return System.nanoTime() >= eventTime;
+        }
+        public abstract void action();
+    }
+    下面的文件包含了一个用来管理并触发事件的实际控制框架。
+    public class Controller {
+        private List<Event> eventList = new ArrayList<Event>();
+        public void addEvent(Event e) { eventList.add(e);}
+        public void run() {
+            while(eventList.size() > 0)
+                for(Event e : new ArrayList<Event>(eventList))
+                    if(e.ready()) {
+                        System.out.println(e);
+                        e.action();
+                        eventList.remove(e);
+                    }
+        }
+    }
+    内部类作用：
+    1）控制框架的完整实现是由单个的类创建的，从而使得实现的细节封装了起来。内部类用来表示解决问题所必须的各种不同的action().
+    2) 内部类能够很容易地访问外围类的任意成员，所以可以避免这种实现得笨拙。如果没有这种能力，代码变得令人讨厌，以至于你肯定会选择别的方法。
+
+10.9 内部类的继承
+    因为内部类的构造器必须连接到指向其外围类对象的引用，所以在继承内部类的时候，事情会变得有点复杂。问题在于，那个指向外围类对象的 “秘密的引用” 必须
+被初始化，而在导出类中不再存在可连接的默认对象。要解决这个问题，必须使用特殊的语法来明确说清他们之间的关联。
     
- 
-
-
 
 
 
